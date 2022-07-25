@@ -14,11 +14,8 @@ def start_messaging(HOST, PORT, thread_id):
 
 def messaging(conn, current_thread_id):
     with conn:
-        # welcome_message = get_message(conn)
-        # print(welcome_message)
         for _ in range(2):
             try:
-                # message = input('enter a message to echo: ')
                 message = str(random.Random().randint(a=1, b=50))
                 send_message(conn, message)
                 print(f'client {current_thread_id} logs: {get_message(conn)}')
@@ -33,7 +30,7 @@ if __name__ == '__main__':
     start = datetime.now().timestamp()
     thrds = []
     for i in range(10):
-        thr = threading.Thread(target=start_messaging, args=('127.0.0.1', 12345, i))
+        thr = threading.Thread(target=start_messaging, args=('127.0.0.1', 12346, i))
         thr.start()
         thrds.append(thr)
 
