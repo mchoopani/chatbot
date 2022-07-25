@@ -3,38 +3,50 @@ import socket
 import threading
 from datetime import datetime
 
-from helpers import get_message, send_message
+from helpers import get_message, send_message, time_calculator
 
 
-def start_messaging(HOST, PORT, thread_id):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST, PORT))
-        messaging(s, thread_id)
+class Client:
+    _threads = []
+
+    def __init__(self, HOST, PORT, id_):
+        self.HOST = HOST
+        self.PORT = PORT
+
+        thread = threading.Thread(target=self.start_messaging, args=(self.HOST, self.PORT, id_))
+        thread.start()
+        Client._threads.append(thread)
+
+    def start_messaging(self, HOST, PORT, thread_id):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            self.messaging(s, thread_id)
+
+    def messaging(self, conn, current_thread_id):
+        with conn:
+            for _ in range(2):
+                try:
+                    message = str(random.Random().randint(a=1, b=50))
+                    send_message(conn, message)
+                    print(f'client {current_thread_id} logs: {get_message(conn)}')
+                except Exception as e:
+                    print(f'Exception: {str(e)}')
+                    break
+            send_message(conn, 'exit')
+            get_message(conn)
+
+    @staticmethod
+    def client_joins():
+        for thread in Client._threads:
+            thread.join()
 
 
-def messaging(conn, current_thread_id):
-    with conn:
-        for _ in range(2):
-            try:
-                message = str(random.Random().randint(a=1, b=50))
-                send_message(conn, message)
-                print(f'client {current_thread_id} logs: {get_message(conn)}')
-            except Exception as e:
-                print(f'Exception: {str(e)}')
-                break
-        send_message(conn, 'exit')
-        get_message(conn)
+@time_calculator
+def run_clients(count, HOST, PORT):
+    for i in range(count):
+        Client(HOST, PORT, i)
+    Client.client_joins()
 
 
 if __name__ == '__main__':
-    start = datetime.now().timestamp()
-    thrds = []
-    for i in range(10):
-        thr = threading.Thread(target=start_messaging, args=('127.0.0.1', 12346, i))
-        thr.start()
-        thrds.append(thr)
-
-    for thr in thrds:
-        thr.join()
-    end = datetime.now().timestamp()
-    print(f'Process time is : {end - start}')
+    run_clients(10, '127.0.0.1', 12346)
