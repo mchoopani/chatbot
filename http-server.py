@@ -27,7 +27,10 @@ class MyRequestHandler(BaseHTTPRequestHandler):
         try:
             for d in os.listdir('.'+self.path):
                 path = self.path + ('/' if self.path[-1] != '/' else '')
-                output += f'<a href = "localhost:8000{path}{d}">{d}</a><br>'
+                if os.path.isdir(f'.{path}{d}'):
+                    output += f'<a href = "{path}{d}"><li>{d}</li></a>'
+                else:
+                    output += f'{d}<br>'
         except Exception as e:
             output = str(e)
 
