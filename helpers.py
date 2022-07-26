@@ -4,7 +4,9 @@ from datetime import datetime
 class ConnectionHelper:
     @staticmethod
     def get_message(conn):
-        return conn.recv(1024).decode('utf-8')
+        if message := conn.recv(1024).decode('utf-8') == '':
+            raise Exception('Client disconnected!')
+        return message
 
     @staticmethod
     def send_message(conn, message):
