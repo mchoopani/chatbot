@@ -1,5 +1,5 @@
 import socket
-from helpers import send_message, get_message
+from helpers import ConnectionHelper
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -32,9 +32,9 @@ class Server:
         with conn:
             while True:
                 try:
-                    message_from_client = get_message(conn)
+                    message_from_client = ConnectionHelper.get_message(conn)
                     time.sleep(1)
-                    result = send_message(conn, message_from_client)
+                    result = ConnectionHelper.send_message(conn, message_from_client)
                     if message_from_client == 'exit' or not result:
                         break
                 except Exception as e:

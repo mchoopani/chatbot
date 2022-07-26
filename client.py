@@ -1,9 +1,8 @@
 import random
 import socket
 import threading
-from datetime import datetime
 
-from helpers import get_message, send_message, time_calculator
+from helpers import ConnectionHelper, time_calculator
 
 
 class Client:
@@ -26,14 +25,15 @@ class Client:
         with conn:
             for _ in range(2):
                 try:
-                    message = str(random.Random().randint(a=1, b=50))
-                    send_message(conn, message)
-                    print(f'client {current_thread_id} logs: {get_message(conn)}')
+                    # message = str(random.Random().randint(a=1, b=50))
+                    message = input('Enter sth to echo: ')
+                    ConnectionHelper.send_message(conn, message)
+                    print(f'client {current_thread_id} logs: {ConnectionHelper.get_message(conn)}')
                 except Exception as e:
                     print(f'Exception: {str(e)}')
                     break
-            send_message(conn, 'exit')
-            get_message(conn)
+            ConnectionHelper.send_message(conn, 'exit')
+            ConnectionHelper.get_message(conn)
 
     @staticmethod
     def client_joins():
@@ -49,4 +49,4 @@ def run_clients(count, HOST, PORT):
 
 
 if __name__ == '__main__':
-    run_clients(10, '127.0.0.1', 12346)
+    run_clients(1, '127.0.0.1', 12346)
